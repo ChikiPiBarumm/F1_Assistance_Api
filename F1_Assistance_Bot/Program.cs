@@ -1,6 +1,6 @@
 ﻿using F1_Assistance_Bot.Data;
 using Microsoft.EntityFrameworkCore;
-using static F1_Assistance_Bot.Controllers.ErgastContoller;
+using static F1_Assistance_Bot.Controllers.ErgastController;
 
 var builder = WebApplication.CreateBuilder(args);
 

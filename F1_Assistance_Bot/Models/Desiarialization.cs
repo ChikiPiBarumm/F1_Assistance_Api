@@ -12,6 +12,8 @@ namespace F1_Assistance_Bot.Models
         public SeasonTable SeasonTable { get; set; }
         public StandingsTable StandingsTable { get; set; }
         public CircuitTable CircuitTable { get; set; }
+        public DriverTable DriverTable { get; set; }
+        public ConstructorTable ConstructorTable { get; set; }
     }
 
     public class RaceTable
@@ -21,6 +23,7 @@ namespace F1_Assistance_Bot.Models
 
     public class Race
     {
+
         public string RaceName { get; set; }
         public Circuit Circuit { get; set; }
         public List<Result> Results { get; set; }
@@ -28,14 +31,16 @@ namespace F1_Assistance_Bot.Models
         public string Date { get; set; }
         public string Time { get; set; }
         public string Season { get; set; }
-        public string Round { get; set; }
+        public int Round { get; set; }
         public List<Lap> Laps { get; set; }
+        public string Url { get; set; }
     }
 
     
 
     public class Result
     {
+        public string Url { get; set; }
         public string Position { get; set; }
         public string Points { get; set; }
         public Driver Driver { get; set; }
@@ -44,6 +49,7 @@ namespace F1_Assistance_Bot.Models
 
     public class Driver
     {
+        public string DriverId { get; set; }
         public string GivenName { get; set; }
         public string FamilyName { get; set; }
         public string Nationality { get; set; }
@@ -68,10 +74,12 @@ namespace F1_Assistance_Bot.Models
 
     public class RaceScheduleEntry
     {
+        public int Round { get; set; }
         public string RaceName { get; set; }
         public string CircuitName { get; set; }
         public string Date { get; set; }
         public string Time { get; set; }
+        public string Url { get; set; }
     }
 
     public class SeasonTable
@@ -159,6 +167,7 @@ namespace F1_Assistance_Bot.Models
     public class Circuit
     {
         public string CircuitId { get; set; }
+        public string Url { get; set; }
         public string CircuitName { get; set; }
         public Location Location { get; set; }
     }
@@ -167,6 +176,7 @@ namespace F1_Assistance_Bot.Models
     {
         public string Country { get; set; }
         public string Locality { get; set; }
+        public string Longtitude { get; set; }
     }
 
     public class Lap
@@ -180,5 +190,32 @@ namespace F1_Assistance_Bot.Models
         public string DriverId { get; set; }
         public string Time { get; set; }
     }
+    
+    public class DriverInfo
+    {
+        public string DriverId { get; set; }
+        public string Url { get; set; }
+        public string GivenName { get; set; }
+        public string FamilyName { get; set; }
+        public string Nationality { get; set; }
+    }
+    public class DriverTable
+    {
+        public List<DriverInfo> Drivers { get; set; }
+    }
+    
+    public class ConstructorInfo
+    {
+        public string ConstructorId { get; set; }
+        public string Url { get; set; }
+        public string Name { get; set; }
+        public string Nationality { get; set; }
+    }
+    
+    public class ConstructorTable
+    {
+        public List<ConstructorInfo> Constructors { get; set; }
+    }
+    
 }
 

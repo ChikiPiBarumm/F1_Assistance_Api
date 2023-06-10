@@ -5,7 +5,6 @@ namespace F1_Assistance_Bot.Models
 	{
         public string ChatId { get; set; }
         public string DriverId { get; set; }
-        public string TeamId { get; set; } 
-    }
+	}
 }
 

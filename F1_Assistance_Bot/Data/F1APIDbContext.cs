@@ -11,6 +11,7 @@ namespace F1_Assistance_Bot.Data
 		}
 
 		public DbSet<Models.User> Users { get; set; }
+		
 	}
 }
 

@@ -5,6 +5,8 @@ VisualStudioVersion = 25.0.1705.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F1_Assistance_Bot", "F1_Assistance_Bot\F1_Assistance_Bot.csproj", "{E410BDCB-9EC0-4E6D-8ED7-C3A2D30BDDBD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "bot", "bot", "{49ED8103-3E99-4298-B007-42CDD0ABD2E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

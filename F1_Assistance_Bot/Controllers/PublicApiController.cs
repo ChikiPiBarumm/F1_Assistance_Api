@@ -16,20 +16,22 @@ namespace F1_Assistance_Bot.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ErgastContoller : Controller
+    public class ErgastController : Controller
     {
         private readonly HttpClient httpClient;
 
         
-        public ErgastContoller()
+        public ErgastController()
         {
             httpClient = new HttpClient();
         }
 
-        [HttpGet("latest-race-result")]
-        public async Task<IActionResult> GetLatestRaceResult()
+        
+
+        [HttpGet("race-result/{year}/{round}/results")]
+        public async Task<IActionResult> GetLatestRaceResult([FromRoute] string year, string round)
         {
-            string apiUrl = "http://ergast.com/api/f1/current/last/results.json";
+            string apiUrl = "http://ergast.com/api/f1/"+year+"/"+round+"/results.json";
 
             try
             {
@@ -72,10 +74,10 @@ namespace F1_Assistance_Bot.Controllers
             }
         }
 
-        [HttpGet("race-schedule")]
-        public async Task<IActionResult> GetRaceSchedule()
+        [HttpGet("race-schedule/{year}")]
+        public async Task<IActionResult> GetRaceSchedule([FromRoute] string year)
         {
-            string apiUrl = "http://ergast.com/api/f1/current.json";
+            string apiUrl = "http://ergast.com/api/f1/"+year+".json";
 
             try
             {
@@ -94,10 +96,13 @@ namespace F1_Assistance_Bot.Controllers
                 {
                     var entry = new RaceScheduleEntry
                     {
+                        Round = race.Round,
                         RaceName = race.RaceName,
                         CircuitName = race.Circuit.CircuitName,
+                        Url = race.Url,
                         Date = race.Date,
                         Time = race.Time
+                        
                     };
 
                     raceSchedule.Add(entry);
@@ -115,7 +120,7 @@ namespace F1_Assistance_Bot.Controllers
         [HttpGet("list-of-seasons")]
         public async Task<IActionResult> GetSeasonList()
         {
-            string apiUrl = "http://ergast.com/api/f1/seasons.json";
+            string apiUrl = "http://ergast.com/api/f1/seasons.json?limit=100&offset=50";
 
             try
             {
@@ -144,58 +149,10 @@ namespace F1_Assistance_Bot.Controllers
             }
         }
 
-        [HttpGet("qualifying-results")]
-        public async Task<IActionResult> GetQualifyingResults()
+        [HttpGet("driver-standings/{year}/{round}/driverStandings")]
+        public async Task<IActionResult> GetDriverStandings([FromRoute] string year, string round)
         {
-            string apiUrl = "http://ergast.com/api/f1/current/last/qualifying.json";
-
-            try
-            {
-                HttpResponseMessage response = await httpClient.GetAsync(apiUrl);
-                response.EnsureSuccessStatusCode();
-
-                string responseBody = await response.Content.ReadAsStringAsync();
-
-                // Deserialize the JSON response into objects
-                var result = JsonConvert.DeserializeObject<RootObject>(responseBody);
-
-                // Extract the relevant information and create a list of qualifying results
-                var qualifyingResults = new List<QualifyingResultEntry>();
-
-                foreach (var raceResult in result.MRData.RaceTable.Races)
-                {
-                    foreach (var driverResult in raceResult.QualifyingResults)
-                    {
-                        var entry = new QualifyingResultEntry
-                        {
-                            RaceName = raceResult.RaceName,
-                            CircuitName = raceResult.Circuit.CircuitName,
-                            GivenName = driverResult.Driver.GivenName,
-                            FamilyName = driverResult.Driver.FamilyName,
-                            ConstructorName = driverResult.Constructor.Name,
-                            Position = driverResult.Position,
-                            Q1Time = driverResult.Q1,
-                            Q2Time = driverResult.Q2,
-                            Q3Time = driverResult.Q3
-                        };
-
-                        qualifyingResults.Add(entry);
-                    }
-                }
-
-                // Return the list of qualifying results
-                return Ok(qualifyingResults);
-            }
-            catch (HttpRequestException ex)
-            {
-                return BadRequest($"Error: {ex.Message}");
-            }
-        }
-
-        [HttpGet("driver-standings")]
-        public async Task<IActionResult> GetDriverStandings()
-        {
-            string apiUrl = "http://ergast.com/api/f1/current/last/driverStandings.json";
+            string apiUrl = "http://ergast.com/api/f1/"+year+"/"+round+"/driverStandings.json";
 
             try
             {
@@ -234,10 +191,10 @@ namespace F1_Assistance_Bot.Controllers
             }
         }
 
-        [HttpGet("constructor-standings")]
-        public async Task<IActionResult> GetConstructorStandings()
+        [HttpGet("constructor-standings/{year}/{round}/constructorStandings")]
+        public async Task<IActionResult> GetConstructorStandings([FromRoute] string year, string round)
         {
-            string apiUrl = "http://ergast.com/api/f1/current/last/constructorStandings.json";
+            string apiUrl = "http://ergast.com/api/f1/"+year+"/"+round+"/constructorStandings.json";
 
             try
             {
@@ -274,10 +231,10 @@ namespace F1_Assistance_Bot.Controllers
             }
         }
 
-        [HttpGet("circuits")]
-        public async Task<IActionResult> GetCircuits()
+        [HttpGet("circuits-info/{year}/{round}/circuits")]
+        public async Task<IActionResult> GetCircuits([FromRoute] string year, string round)
         {
-            string apiUrl = "http://ergast.com/api/f1/circuits.json";
+            string apiUrl = "http://ergast.com/api/f1/"+year+"/"+round+"/circuits.json";
 
             try
             {
@@ -296,6 +253,7 @@ namespace F1_Assistance_Bot.Controllers
                 {
                     var entry = new Circuit
                     {
+                        Url = circuit.Url,
                         CircuitId = circuit.CircuitId,
                         CircuitName = circuit.CircuitName,
                         Location = new Location
@@ -358,6 +316,153 @@ namespace F1_Assistance_Bot.Controllers
                 return BadRequest($"Error: {ex.Message}");
             }
         }
+        
+        [HttpGet("qualifying-results/{year}/{round}/qualifying")]
+        public async Task<IActionResult> GetQualifyingResults([FromRoute] string year, string round)
+        {
+            string apiUrl = "http://ergast.com/api/f1/"+year+"/"+round+"/qualifying.json";
+
+            try
+            {
+                HttpResponseMessage response = await httpClient.GetAsync(apiUrl);
+                response.EnsureSuccessStatusCode();
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                // Deserialize the JSON response into objects
+                var result = JsonConvert.DeserializeObject<RootObject>(responseBody);
+
+                // Extract the relevant information and create a list of qualifying results
+                var qualifyingResults = new List<QualifyingResultEntry>();
+
+                foreach (var raceResult in result.MRData.RaceTable.Races)
+                {
+                    foreach (var driverResult in raceResult.QualifyingResults)
+                    {
+                        var entry = new QualifyingResultEntry
+                        {
+                            RaceName = raceResult.RaceName,
+                            CircuitName = raceResult.Circuit.CircuitName,
+                            GivenName = driverResult.Driver.GivenName,
+                            FamilyName = driverResult.Driver.FamilyName,
+                            ConstructorName = driverResult.Constructor.Name,
+                            Position = driverResult.Position,
+                            Q1Time = driverResult.Q1,
+                            Q2Time = driverResult.Q2,
+                            Q3Time = driverResult.Q3
+                        };
+
+                        qualifyingResults.Add(entry);
+                    }
+                }
+
+                // Return the list of qualifying results
+                return Ok(qualifyingResults);
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest($"Error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("driver-info/{year}/{round}")]
+        public async Task<IActionResult> GetDriverInfo([FromRoute] string year, [FromRoute] string round)
+        {
+            string apiUrl = $"http://ergast.com/api/f1/{year}/{round}/drivers.json";
+
+            try
+            {
+                HttpResponseMessage response = await httpClient.GetAsync(apiUrl);
+                response.EnsureSuccessStatusCode();
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                // Deserialize the JSON response into objects
+                var result = JsonConvert.DeserializeObject<RootObject>(responseBody);
+
+                // Extract the relevant driver information
+                var driverInfoList = new List<DriverInfo>();
+
+                if (result?.MRData?.DriverTable?.Drivers != null)
+                {
+                    foreach (var driver in result.MRData.DriverTable.Drivers)
+                    {
+                        var driverInfo = new DriverInfo
+                        {
+                            DriverId = driver.DriverId,
+                            Url = driver.Url,
+                            GivenName = driver.GivenName,
+                            FamilyName = driver.FamilyName,
+                            Nationality = driver.Nationality,
+                        };
+
+                        driverInfoList.Add(driverInfo);
+                    }
+
+                    // Return the driver information
+                    return Ok(driverInfoList);
+                }
+                else
+                {
+                    // Handle the case when the necessary objects are null
+                    return BadRequest("Invalid response from the API.");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest($"Error: {ex.Message}");
+            }
+        }
+        
+        [HttpGet("constructor-info/{year}/{round}")]
+        public async Task<IActionResult> GetConstructorInfo([FromRoute] string year, [FromRoute] string round)
+        {
+            string apiUrl = $"http://ergast.com/api/f1/{year}/{round}/constructors.json";
+
+            try
+            {
+                HttpResponseMessage response = await httpClient.GetAsync(apiUrl);
+                response.EnsureSuccessStatusCode();
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                // Deserialize the JSON response into objects
+                var result = JsonConvert.DeserializeObject<RootObject>(responseBody);
+
+                // Extract the relevant constructor information
+                var constructorInfoList = new List<ConstructorInfo>();
+
+                if (result?.MRData?.ConstructorTable?.Constructors != null)
+                {
+                    foreach (var constructor in result.MRData.ConstructorTable.Constructors)
+                    {
+                        var constructorInfo = new ConstructorInfo
+                        {
+                            ConstructorId = constructor.ConstructorId,
+                            Url = constructor.Url,
+                            Name = constructor.Name,
+                            Nationality = constructor.Nationality
+                        };
+
+                        constructorInfoList.Add(constructorInfo);
+                    }
+
+                    // Return the constructor information
+                    return Ok(constructorInfoList);
+                }
+                else
+                {
+                    // Handle the case when the necessary objects are null
+                    return BadRequest("Invalid response from the API.");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest($"Error: {ex.Message}");
+            }
+        }
+
+
 
     }
 }
